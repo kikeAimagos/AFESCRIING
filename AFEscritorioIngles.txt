@@ -1,0 +1,1929 @@
+UIImageView+AFNetworking.h
+============================================================
+Language: Objective-C
+Licence: Other
+
+// UIImageView+AFNetworking.h
+//
+// Copyright (c) 2011 Gowalla (http://gowalla.com/)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#import <Foundation/Foundation.h>
+#import "AFImageRequestOperation.h"
+
+#import <Availability.h>
+
+#if __IPHONE_OS_VERSION_MIN_REQUIRED
+#import <UIKit/UIKit.h>
+
+/**
+ This category adds methods to the UIKit framework's `UIImageView` class. The methods in this category provide support for loading remote images asynchronously from a URL.
+ */
+@interface UIImageView (AFNetworking)
+
+/**
+ Creates and enqueues an image request operation, which asynchronously downloads the image from the specified URL, and sets it the request is finished. Any previous image request for the receiver will be cancelled. If the image is cached locally, the image is set immediately, otherwise the specified placeholder image will be set immediately, and then the remote image will be set once the request is finished.
+
+ By default, URL requests have a cache policy of `NSURLCacheStorageAllowed` and a timeout interval of 30 seconds, and are set not handle cookies. To configure URL requests differently, use `setImageWithURLRequest:placeholderImage:success:failure:`
+
+ @param url The URL used for the image request.
+ */
+- (void)setImageWithURL:(NSURL *)url;
+
+/**
+ Creates and enqueues an image request operation, which asynchronously downloads the image from the specified URL. Any previous image request for the receiver will be cancelled. If the image is cached locally, the image is set immediately, otherwise the specified placeholder image will be set immediately, and then the remote image will be set once the request is finished.
+
+ By default, URL requests have a cache policy of `NSURLCacheStorageAllowed` and a timeout interval of 30 seconds, and are set not handle cookies. To configure URL requests differently, use `setImageWithURLRequest:placeholderImage:success:failure:`
+ 
+ @param url The URL used for the image request.
+ @param placeholderImage The image to be set initially, until the image request finishes. If `nil`, the image view will not change its image until the image request finishes.
+ */
+- (void)setImageWithURL:(NSURL *)url
+       placeholderImage:(UIImage *)placeholderImage;
+
+/**
+ Creates and enqueues an image request operation, which asynchronously downloads the image with the specified URL request object. Any previous image request for the receiver will be cancelled. If the image is cached locally, the image is set immediately, otherwise the specified placeholder image will be set immediately, and then the remote image will be set once the request is finished.
+ 
+ If a success block is specified, it is the responsibility of the block to set the image of the image view before returning. If no success block is specified, the default behavior of setting the image with `self.image = image` is executed.
+
+ @param urlRequest The URL request used for the image request.
+ @param placeholderImage The image to be set initially, until the image request finishes. If `nil`, the image view will not change its image until the image request finishes.
+ @param success A block to be executed when the image request operation finishes successfully, with a status code in the 2xx range, and with an acceptable content type (e.g. `image/png`). This block has no return value and takes three arguments: the request sent from the client, the response received from the server, and the image created from the response data of request. If the image was returned from cache, the request and response parameters will be `nil`.
+ @param failure A block object to be executed when the image request operation finishes unsuccessfully, or that finishes successfully. This block has no return value and takes three arguments: the request sent from the client, the response received from the server, and the error object describing the network or parsing error that occurred.
+ */
+- (void)setImageWithURLRequest:(NSURLRequest *)urlRequest
+              placeholderImage:(UIImage *)placeholderImage
+                       success:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image))success
+                       failure:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error))failure;
+
+/**
+ Cancels any executing image request operation for the receiver, if one exists.
+ */
+- (void)cancelImageRequestOperation;
+
+@end
+
+#endif
+
+
+
+
+AFJSONRequestOperation.h
+============================================================
+Language: Objective-C
+Licence: Other
+
+// AFJSONRequestOperation.h
+//
+// Copyright (c) 2011 Gowalla (http://gowalla.com/)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#import <Foundation/Foundation.h>
+#import "AFHTTPRequestOperation.h"
+
+/**
+ `AFJSONRequestOperation` is a subclass of `AFHTTPRequestOperation` for downloading and working with JSON response data.
+ 
+ ## Acceptable Content Types
+ 
+ By default, `AFJSONRequestOperation` accepts the following MIME types, which includes the official standard, `application/json`, as well as other commonly-used types:
+ 
+ - `application/json`
+ - `text/json`
+
+ @warning JSON parsing will use the built-in `NSJSONSerialization` class.
+ */
+@interface AFJSONRequestOperation : AFHTTPRequestOperation
+
+///----------------------------
+/// @name Getting Response Data
+///----------------------------
+
+/**
+ A JSON object constructed from the response data. If an error occurs while parsing, `nil` will be returned, and the `error` property will be set to the error.
+ */
+@property (readonly, nonatomic, strong) id responseJSON;
+
+/**
+ Options for reading the response JSON data and creating the Foundation objects. For possible values, see the `NSJSONSerialization` documentation section "NSJSONReadingOptions".
+ */
+@property (nonatomic, assign) NSJSONReadingOptions JSONReadingOptions;
+ 
+///----------------------------------
+/// @name Creating Request Operations
+///----------------------------------
+
+/**
+ Creates and returns an `AFJSONRequestOperation` object and sets the specified success and failure callbacks.
+ 
+ @param urlRequest The request object to be loaded asynchronously during execution of the operation
+ @param success A block object to be executed when the operation finishes successfully. This block has no return value and takes three arguments: the request sent from the client, the response received from the server, and the JSON object created from the response data of request.
+ @param failure A block object to be executed when the operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data as JSON. This block has no return value and takes three arguments: the request sent from the client, the response received from the server, and the error describing the network or parsing error that occurred.
+  
+ @return A new JSON request operation
+ */
++ (instancetype)JSONRequestOperationWithRequest:(NSURLRequest *)urlRequest
+                                        success:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, id JSON))success
+                                        failure:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON))failure;
+
+@end
+
+
+
+
+AFPropertyListRequestOperation.h
+============================================================
+Language: Objective-C
+Licence: Other
+
+// AFPropertyListRequestOperation.h
+//
+// Copyright (c) 2011 Gowalla (http://gowalla.com/)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#import <Foundation/Foundation.h>
+#import "AFHTTPRequestOperation.h"
+
+/**
+ `AFPropertyListRequestOperation` is a subclass of `AFHTTPRequestOperation` for downloading and deserializing objects with property list (plist) response data.
+
+ ## Acceptable Content Types
+
+ By default, `AFPropertyListRequestOperation` accepts the following MIME types:
+
+ - `application/x-plist`
+ */
+@interface AFPropertyListRequestOperation : AFHTTPRequestOperation
+
+///----------------------------
+/// @name Getting Response Data
+///----------------------------
+
+/**
+ An object deserialized from a plist constructed using the response data.
+ */
+@property (readonly, nonatomic) id responsePropertyList;
+
+///--------------------------------------
+/// @name Managing Property List Behavior
+///--------------------------------------
+
+/**
+ One of the `NSPropertyListMutabilityOptions` options, specifying the mutability of objects deserialized from the property list. By default, this is `NSPropertyListImmutable`.
+ */
+@property (nonatomic, assign) NSPropertyListReadOptions propertyListReadOptions;
+
+/**
+ Creates and returns an `AFPropertyListRequestOperation` object and sets the specified success and failure callbacks.
+
+ @param urlRequest The request object to be loaded asynchronously during execution of the operation
+ @param success A block object to be executed when the operation finishes successfully. This block has no return value and takes three arguments: the request sent from the client, the response received from the server, and the object deserialized from a plist constructed using the response data.
+ @param failure A block object to be executed when the operation finishes unsuccessfully, or that finishes successfully, but encountered an error while deserializing the object from a property list. This block has no return value and takes three arguments: the request sent from the client, the response received from the server, and the error describing the network or parsing error that occurred.
+
+ @return A new property list request operation
+ */
++ (instancetype)propertyListRequestOperationWithRequest:(NSURLRequest *)urlRequest
+												success:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, id propertyList))success
+												failure:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id propertyList))failure;
+
+@end
+
+
+
+
+AFURLConnectionOperation.h
+============================================================
+Language: Objective-C
+Licence: Other
+
+// AFURLConnectionOperation.h
+//
+// Copyright (c) 2011 Gowalla (http://gowalla.com/)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#import <Foundation/Foundation.h>
+
+#import <Availability.h>
+
+/**
+ `AFURLConnectionOperation` is a subclass of `NSOperation` that implements `NSURLConnection` delegate methods.
+
+ ## Subclassing Notes
+
+ This is the base class of all network request operations. You may wish to create your own subclass in order to implement additional `NSURLConnection` delegate methods (see "`NSURLConnection` Delegate Methods" below), or to provide additional properties and/or class constructors.
+
+ If you are creating a subclass that communicates over the HTTP or HTTPS protocols, you may want to consider subclassing `AFHTTPRequestOperation` instead, as it supports specifying acceptable content types or status codes.
+
+ ## NSURLConnection Delegate Methods
+
+ `AFURLConnectionOperation` implements the following `NSURLConnection` delegate methods:
+
+ - `connection:didReceiveResponse:`
+ - `connection:didReceiveData:`
+ - `connectionDidFinishLoading:`
+ - `connection:didFailWithError:`
+ - `connection:didSendBodyData:totalBytesWritten:totalBytesExpectedToWrite:`
+ - `connection:willCacheResponse:`
+ - `connection:canAuthenticateAgainstProtectionSpace:`
+ - `connection:didReceiveAuthenticationChallenge:`
+ - `connectionShouldUseCredentialStorage:`
+ - `connection:needNewBodyStream:`
+
+ If any of these methods are overridden in a subclass, they _must_ call the `super` implementation first.
+
+ ## Class Constructors
+
+ Class constructors, or methods that return an unowned instance, are the preferred way for subclasses to encapsulate any particular logic for handling the setup or parsing of response data. For instance, `AFJSONRequestOperation` provides `JSONRequestOperationWithRequest:success:failure:`, which takes block arguments, whose parameter on for a successful request is the JSON object initialized from the `response data`.
+
+ ## Callbacks and Completion Blocks
+
+ The built-in `completionBlock` provided by `NSOperation` allows for custom behavior to be executed after the request finishes. It is a common pattern for class constructors in subclasses to take callback block parameters, and execute them conditionally in the body of its `completionBlock`. Make sure to handle cancelled operations appropriately when setting a `completionBlock` (i.e. returning early before parsing response data). See the implementation of any of the `AFHTTPRequestOperation` subclasses for an example of this.
+
+ Subclasses are strongly discouraged from overriding `setCompletionBlock:`, as `AFURLConnectionOperation`'s implementation includes a workaround to mitigate retain cycles, and what Apple rather ominously refers to as ["The Deallocation Problem"](http://developer.apple.com/library/ios/#technotes/tn2109/).
+ 
+ ## SSL Pinning
+ 
+ Relying on the CA trust model to validate SSL certificates exposes your app to security vulnerabilities, such as man-in-the-middle attacks. For applications that connect to known servers, SSL certificate pinning provides an increased level of security, by checking server certificate validity against those specified in the app bundle.
+ 
+ SSL with certificate pinning is strongly recommended for any application that transmits sensitive information to an external webservice.
+
+ When `_AFNETWORKING_PIN_SSL_CERTIFICATES_` is defined and the Security framework is linked, connections will be validated on all matching certificates with a `.cer` extension in the bundle root.
+
+ ## NSCoding & NSCopying Conformance
+
+ `AFURLConnectionOperation` conforms to the `NSCoding` and `NSCopying` protocols, allowing operations to be archived to disk, and copied in memory, respectively. However, because of the intrinsic limitations of capturing the exact state of an operation at a particular moment, there are some important caveats to keep in mind:
+
+ ### NSCoding Caveats
+
+ - Encoded operations do not include any block or stream properties. Be sure to set `completionBlock`, `outputStream`, and any callback blocks as necessary when using `-initWithCoder:` or `NSKeyedUnarchiver`.
+ - Operations are paused on `encodeWithCoder:`. If the operation was encoded while paused or still executing, its archived state will return `YES` for `isReady`. Otherwise, the state of an operation when encoding will remain unchanged.
+
+ ### NSCopying Caveats
+
+ - `-copy` and `-copyWithZone:` return a new operation with the `NSURLRequest` of the original. So rather than an exact copy of the operation at that particular instant, the copying mechanism returns a completely new instance, which can be useful for retrying operations.
+ - A copy of an operation will not include the `outputStream` of the original.
+ - Operation copies do not include `completionBlock`. `completionBlock` often strongly captures a reference to `self`, which would otherwise have the unintuitive side-effect of pointing to the _original_ operation when copied.
+ */
+
+#ifdef _AFNETWORKING_PIN_SSL_CERTIFICATES_
+typedef enum {
+    AFSSLPinningModeNone,
+    AFSSLPinningModePublicKey,
+    AFSSLPinningModeCertificate,
+} AFURLConnectionOperationSSLPinningMode;
+#endif
+
+@interface AFURLConnectionOperation : NSOperation <NSURLConnectionDelegate,
+#if (defined(__IPHONE_OS_VERSION_MIN_REQUIRED) && __IPHONE_OS_VERSION_MIN_REQUIRED >= 50000) || \
+    (defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 1080)
+NSURLConnectionDataDelegate, 
+#endif
+NSCoding, NSCopying>
+
+///-------------------------------
+/// @name Accessing Run Loop Modes
+///-------------------------------
+
+/**
+ The run loop modes in which the operation will run on the network thread. By default, this is a single-member set containing `NSRunLoopCommonModes`.
+ */
+@property (nonatomic, strong) NSSet *runLoopModes;
+
+///-----------------------------------------
+/// @name Getting URL Connection Information
+///-----------------------------------------
+
+/**
+ The request used by the operation's connection.
+ */
+@property (readonly, nonatomic, strong) NSURLRequest *request;
+
+/**
+ The last response received by the operation's connection.
+ */
+@property (readonly, nonatomic, strong) NSURLResponse *response;
+
+/**
+ The error, if any, that occurred in the lifecycle of the request.
+ */
+@property (readonly, nonatomic, strong) NSError *error;
+
+/**
+ Whether the connection should accept an invalid SSL certificate.
+ 
+ If `_AFNETWORKING_ALLOW_INVALID_SSL_CERTIFICATES_` is set, this property defaults to `YES` for backwards compatibility. Otherwise, this property defaults to `NO`.
+ */
+@property (nonatomic, assign) BOOL allowsInvalidSSLCertificate;
+
+///----------------------------
+/// @name Getting Response Data
+///----------------------------
+
+/**
+ The data received during the request.
+ */
+@property (readonly, nonatomic, strong) NSData *responseData;
+
+/**
+ The string representation of the response data.
+ */
+@property (readonly, nonatomic, copy) NSString *responseString;
+
+/**
+ The string encoding of the response.
+
+ If the response does not specify a valid string encoding, `responseStringEncoding` will return `NSUTF8StringEncoding`.
+ */
+@property (readonly, nonatomic, assign) NSStringEncoding responseStringEncoding;
+
+///-------------------------------
+/// @name Managing URL Credentials
+///-------------------------------
+
+/**
+ Whether the URL connection should consult the credential storage for authenticating the connection. `YES` by default.
+
+ This is the value that is returned in the `NSURLConnectionDelegate` method `-connectionShouldUseCredentialStorage:`.
+ */
+@property (nonatomic, assign) BOOL shouldUseCredentialStorage;
+
+/**
+ The credential used for authentication challenges in `-connection:didReceiveAuthenticationChallenge:`.
+
+ This will be overridden by any shared credentials that exist for the username or password of the request URL, if present.
+ */
+@property (nonatomic, strong) NSURLCredential *credential;
+
+/**
+ The pinning mode which will be used for SSL connections. `AFSSLPinningModePublicKey` by default.
+ 
+ To enable SSL Pinning, `#define _AFNETWORKING_PIN_SSL_CERTIFICATES_` in `Prefix.pch`. Also, make sure that the Security framework is linked with the binary. See the "SSL Pinning" section in the `AFURLConnectionOperation`" header for more information.
+ */
+#ifdef _AFNETWORKING_PIN_SSL_CERTIFICATES_
+@property (nonatomic, assign) AFURLConnectionOperationSSLPinningMode SSLPinningMode;
+#endif
+
+///------------------------
+/// @name Accessing Streams
+///------------------------
+
+/**
+ The input stream used to read data to be sent during the request.
+
+ This property acts as a proxy to the `HTTPBodyStream` property of `request`.
+ */
+@property (nonatomic, strong) NSInputStream *inputStream;
+
+/**
+ The output stream that is used to write data received until the request is finished.
+
+ By default, data is accumulated into a buffer that is stored into `responseData` upon completion of the request. When `outputStream` is set, the data will not be accumulated into an internal buffer, and as a result, the `responseData` property of the completed request will be `nil`. The output stream will be scheduled in the network thread runloop upon being set.
+ */
+@property (nonatomic, strong) NSOutputStream *outputStream;
+
+///---------------------------------------------
+/// @name Managing Request Operation Information
+///---------------------------------------------
+
+/**
+ The user info dictionary for the receiver.
+ */
+@property (nonatomic, strong) NSDictionary *userInfo;
+
+///------------------------------------------------------
+/// @name Initializing an AFURLConnectionOperation Object
+///------------------------------------------------------
+
+/**
+ Initializes and returns a newly allocated operation object with a url connection configured with the specified url request.
+ 
+ This is the designated initializer.
+ 
+ @param urlRequest The request object to be used by the operation connection.
+ */
+- (id)initWithRequest:(NSURLRequest *)urlRequest;
+
+///----------------------------------
+/// @name Pausing / Resuming Requests
+///----------------------------------
+
+/**
+ Pauses the execution of the request operation.
+
+ A paused operation returns `NO` for `-isReady`, `-isExecuting`, and `-isFinished`. As such, it will remain in an `NSOperationQueue` until it is either cancelled or resumed. Pausing a finished, cancelled, or paused operation has no effect.
+ */
+- (void)pause;
+
+/**
+ Whether the request operation is currently paused.
+
+ @return `YES` if the operation is currently paused, otherwise `NO`.
+ */
+- (BOOL)isPaused;
+
+/**
+ Resumes the execution of the paused request operation.
+
+ Pause/Resume behavior varies depending on the underlying implementation for the operation class. In its base implementation, resuming a paused requests restarts the original request. However, since HTTP defines a specification for how to request a specific content range, `AFHTTPRequestOperation` will resume downloading the request from where it left off, instead of restarting the original request.
+ */
+- (void)resume;
+
+///----------------------------------------------
+/// @name Configuring Backgrounding Task Behavior
+///----------------------------------------------
+
+/**
+ Specifies that the operation should continue execution after the app has entered the background, and the expiration handler for that background task.
+
+ @param handler A handler to be called shortly before the application’s remaining background time reaches 0. The handler is wrapped in a block that cancels the operation, and cleans up and marks the end of execution, unlike the `handler` parameter in `UIApplication -beginBackgroundTaskWithExpirationHandler:`, which expects this to be done in the handler itself. The handler is called synchronously on the main thread, thus blocking the application’s suspension momentarily while the application is notified.
+ */
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
+- (void)setShouldExecuteAsBackgroundTaskWithExpirationHandler:(void (^)(void))handler;
+#endif
+
+///---------------------------------
+/// @name Setting Progress Callbacks
+///---------------------------------
+
+/**
+ Sets a callback to be called when an undetermined number of bytes have been uploaded to the server.
+
+ @param block A block object to be called when an undetermined number of bytes have been uploaded to the server. This block has no return value and takes three arguments: the number of bytes written since the last time the upload progress block was called, the total bytes written, and the total bytes expected to be written during the request, as initially determined by the length of the HTTP body. This block may be called multiple times, and will execute on the main thread.
+ */
+- (void)setUploadProgressBlock:(void (^)(NSUInteger bytesWritten, long long totalBytesWritten, long long totalBytesExpectedToWrite))block;
+
+/**
+ Sets a callback to be called when an undetermined number of bytes have been downloaded from the server.
+
+ @param block A block object to be called when an undetermined number of bytes have been downloaded from the server. This block has no return value and takes three arguments: the number of bytes read since the last time the download progress block was called, the total bytes read, and the total bytes expected to be read during the request, as initially determined by the expected content size of the `NSHTTPURLResponse` object. This block may be called multiple times, and will execute on the main thread.
+ */
+- (void)setDownloadProgressBlock:(void (^)(NSUInteger bytesRead, long long totalBytesRead, long long totalBytesExpectedToRead))block;
+
+///-------------------------------------------------
+/// @name Setting NSURLConnection Delegate Callbacks
+///-------------------------------------------------
+
+/**
+ Sets a block to be executed to determine whether the connection should be able to respond to a protection space's form of authentication, as handled by the `NSURLConnectionDelegate` method `connection:canAuthenticateAgainstProtectionSpace:`.
+
+ @param block A block object to be executed to determine whether the connection should be able to respond to a protection space's form of authentication. The block has a `BOOL` return type and takes two arguments: the URL connection object, and the protection space to authenticate against.
+
+  If `allowsInvalidSSLCertificate` is set to YES, `connection:canAuthenticateAgainstProtectionSpace:` will accept invalid SSL certificates, returning `YES` if the protection space authentication method is `NSURLAuthenticationMethodServerTrust`.
+ */
+- (void)setAuthenticationAgainstProtectionSpaceBlock:(BOOL (^)(NSURLConnection *connection, NSURLProtectionSpace *protectionSpace))block;
+
+/**
+ Sets a block to be executed when the connection must authenticate a challenge in order to download its request, as handled by the `NSURLConnectionDelegate` method `connection:didReceiveAuthenticationChallenge:`.
+
+ @param block A block object to be executed when the connection must authenticate a challenge in order to download its request. The block has no return type and takes two arguments: the URL connection object, and the challenge that must be authenticated.
+
+  If `allowsInvalidSSLCertificate` is set to YES, `connection:didReceiveAuthenticationChallenge:` will attempt to have the challenge sender use credentials with invalid SSL certificates.
+ */
+- (void)setAuthenticationChallengeBlock:(void (^)(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge))block;
+
+/**
+ Sets a block to be executed when the server redirects the request from one URL to another URL, or when the request URL changed by the `NSURLProtocol` subclass handling the request in order to standardize its format, as handled by the `NSURLConnectionDelegate` method `connection:willSendRequest:redirectResponse:`.
+
+ @param block A block object to be executed when the request URL was changed. The block returns an `NSURLRequest` object, the URL request to redirect, and takes three arguments: the URL connection object, the the proposed redirected request, and the URL response that caused the redirect.
+ */
+- (void)setRedirectResponseBlock:(NSURLRequest * (^)(NSURLConnection *connection, NSURLRequest *request, NSURLResponse *redirectResponse))block;
+
+
+/**
+ Sets a block to be executed to modify the response a connection will cache, if any, as handled by the `NSURLConnectionDelegate` method `connection:willCacheResponse:`.
+
+ @param block A block object to be executed to determine what response a connection will cache, if any. The block returns an `NSCachedURLResponse` object, the cached response to store in memory or `nil` to prevent the response from being cached, and takes two arguments: the URL connection object, and the cached response provided for the request.
+ */
+- (void)setCacheResponseBlock:(NSCachedURLResponse * (^)(NSURLConnection *connection, NSCachedURLResponse *cachedResponse))block;
+
+@end
+
+///----------------
+/// @name Constants
+///----------------
+
+/**
+ ## SSL Pinning Options
+
+ The following constants are provided by `AFURLConnectionOperation` as possible SSL Pinning options.
+
+ enum {
+ AFSSLPinningModeNone,
+ AFSSLPinningModePublicKey,
+ AFSSLPinningModeCertificate,
+ }
+ 
+ `AFSSLPinningModeNone`
+ Do not pin SSL connections
+
+ `AFSSLPinningModePublicKey`
+ Pin SSL connections to certificate public key (SPKI).
+
+ `AFSSLPinningModeCertificate`
+ Pin SSL connections to exact certificate. This may cause problems when your certificate expires and needs re-issuance.
+
+ ## User info dictionary keys
+
+ These keys may exist in the user info dictionary, in addition to those defined for NSError.
+
+ - `NSString * const AFNetworkingOperationFailingURLRequestErrorKey`
+ - `NSString * const AFNetworkingOperationFailingURLResponseErrorKey`
+
+ ### Constants
+
+ `AFNetworkingOperationFailingURLRequestErrorKey`
+ The corresponding value is an `NSURLRequest` containing the request of the operation associated with an error. This key is only present in the `AFNetworkingErrorDomain`.
+
+ `AFNetworkingOperationFailingURLResponseErrorKey`
+ The corresponding value is an `NSURLResponse` containing the response of the operation associated with an error. This key is only present in the `AFNetworkingErrorDomain`.
+
+ ## Error Domains
+
+ The following error domain is predefined.
+
+ - `NSString * const AFNetworkingErrorDomain`
+
+ ### Constants
+
+ `AFNetworkingErrorDomain`
+ AFNetworking errors. Error codes for `AFNetworkingErrorDomain` correspond to codes in `NSURLErrorDomain`.
+ */
+extern NSString * const AFNetworkingErrorDomain;
+extern NSString * const AFNetworkingOperationFailingURLRequestErrorKey;
+extern NSString * const AFNetworkingOperationFailingURLResponseErrorKey;
+
+///--------------------
+/// @name Notifications
+///--------------------
+
+/**
+ Posted when an operation begins executing.
+ */
+extern NSString * const AFNetworkingOperationDidStartNotification;
+
+/**
+ Posted when an operation finishes.
+ */
+extern NSString * const AFNetworkingOperationDidFinishNotification;
+
+
+
+
+AFImageRequestOperation.h
+============================================================
+Language: Objective-C
+Licence: Other
+
+// AFImageRequestOperation.h
+//
+// Copyright (c) 2011 Gowalla (http://gowalla.com/)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#import <Foundation/Foundation.h>
+#import "AFHTTPRequestOperation.h"
+
+#import <Availability.h>
+
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
+#import <UIKit/UIKit.h>
+#elif defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
+#import <Cocoa/Cocoa.h>
+#endif
+
+/**
+ `AFImageRequestOperation` is a subclass of `AFHTTPRequestOperation` for downloading an processing images.
+
+ ## Acceptable Content Types
+
+ By default, `AFImageRequestOperation` accepts the following MIME types, which correspond to the image formats supported by UIImage or NSImage:
+
+ - `image/tiff`
+ - `image/jpeg`
+ - `image/gif`
+ - `image/png`
+ - `image/ico`
+ - `image/x-icon`
+ - `image/bmp`
+ - `image/x-bmp`
+ - `image/x-xbitmap`
+ - `image/x-win-bitmap`
+ */
+@interface AFImageRequestOperation : AFHTTPRequestOperation
+
+/**
+ An image constructed from the response data. If an error occurs during the request, `nil` will be returned, and the `error` property will be set to the error.
+ */
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
+@property (readonly, nonatomic, strong) UIImage *responseImage;
+#elif defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
+@property (readonly, nonatomic, strong) NSImage *responseImage;
+#endif
+
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
+/**
+ The scale factor used when interpreting the image data to construct `responseImage`. Specifying a scale factor of 1.0 results in an image whose size matches the pixel-based dimensions of the image. Applying a different scale factor changes the size of the image as reported by the size property. This is set to the value of scale of the main screen by default, which automatically scales images for retina displays, for instance.
+ */
+@property (nonatomic, assign) CGFloat imageScale;
+#endif
+
+/**
+ Creates and returns an `AFImageRequestOperation` object and sets the specified success callback.
+
+ @param urlRequest The request object to be loaded asynchronously during execution of the operation.
+ @param success A block object to be executed when the request finishes successfully. This block has no return value and takes a single arguments, the image created from the response data of the request.
+
+ @return A new image request operation
+ */
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++ (instancetype)imageRequestOperationWithRequest:(NSURLRequest *)urlRequest
+										 success:(void (^)(UIImage *image))success;
+#elif defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
++ (instancetype)imageRequestOperationWithRequest:(NSURLRequest *)urlRequest
+										 success:(void (^)(NSImage *image))success;
+#endif
+
+/**
+ Creates and returns an `AFImageRequestOperation` object and sets the specified success callback.
+
+ @param urlRequest The request object to be loaded asynchronously during execution of the operation.
+ @param imageProcessingBlock A block object to be executed after the image request finishes successfully, but before the image is returned in the `success` block. This block takes a single argument, the image loaded from the response body, and returns the processed image.
+ @param success A block object to be executed when the request finishes successfully, with a status code in the 2xx range, and with an acceptable content type (e.g. `image/png`). This block has no return value and takes three arguments: the request object of the operation, the response for the request, and the image created from the response data.
+ @param failure A block object to be executed when the request finishes unsuccessfully. This block has no return value and takes three arguments: the request object of the operation, the response for the request, and the error associated with the cause for the unsuccessful operation.
+
+ @return A new image request operation
+ */
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
++ (instancetype)imageRequestOperationWithRequest:(NSURLRequest *)urlRequest
+							imageProcessingBlock:(UIImage *(^)(UIImage *image))imageProcessingBlock
+										 success:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image))success
+										 failure:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error))failure;
+#elif defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
++ (instancetype)imageRequestOperationWithRequest:(NSURLRequest *)urlRequest
+							imageProcessingBlock:(NSImage *(^)(NSImage *image))imageProcessingBlock
+										 success:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, NSImage *image))success
+										 failure:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error))failure;
+#endif
+
+@end
+
+
+
+
+AFHTTPRequestOperation.h
+============================================================
+Language: Objective-C
+Licence: Other
+
+// AFHTTPRequestOperation.h
+//
+// Copyright (c) 2011 Gowalla (http://gowalla.com/)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#import <Foundation/Foundation.h>
+#import "AFURLConnectionOperation.h"
+
+/**
+ `AFHTTPRequestOperation` is a subclass of `AFURLConnectionOperation` for requests using the HTTP or HTTPS protocols. It encapsulates the concept of acceptable status codes and content types, which determine the success or failure of a request.
+ */
+@interface AFHTTPRequestOperation : AFURLConnectionOperation
+
+///----------------------------------------------
+/// @name Getting HTTP URL Connection Information
+///----------------------------------------------
+
+/**
+ The last HTTP response received by the operation's connection.
+ */
+@property (readonly, nonatomic, strong) NSHTTPURLResponse *response;
+
+///----------------------------------------------------------
+/// @name Managing And Checking For Acceptable HTTP Responses
+///----------------------------------------------------------
+
+/**
+ A Boolean value that corresponds to whether the status code of the response is within the specified set of acceptable status codes. Returns `YES` if `acceptableStatusCodes` is `nil`.
+ */
+@property (nonatomic, readonly) BOOL hasAcceptableStatusCode;
+
+/**
+ A Boolean value that corresponds to whether the MIME type of the response is among the specified set of acceptable content types. Returns `YES` if `acceptableContentTypes` is `nil`.
+ */
+@property (nonatomic, readonly) BOOL hasAcceptableContentType;
+
+/**
+ The callback dispatch queue on success. If `NULL` (default), the main queue is used.
+ */
+@property (nonatomic, assign) dispatch_queue_t successCallbackQueue;
+
+/**
+ The callback dispatch queue on failure. If `NULL` (default), the main queue is used.
+ */
+@property (nonatomic, assign) dispatch_queue_t failureCallbackQueue;
+
+///------------------------------------------------------------
+/// @name Managing Acceptable HTTP Status Codes & Content Types
+///------------------------------------------------------------
+
+/**
+ Returns an `NSIndexSet` object containing the ranges of acceptable HTTP status codes. When non-`nil`, the operation will set the `error` property to an error in `AFErrorDomain`. See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+
+ By default, this is the range 200 to 299, inclusive.
+ */
++ (NSIndexSet *)acceptableStatusCodes;
+
+/**
+ Adds status codes to the set of acceptable HTTP status codes returned by `+acceptableStatusCodes` in subsequent calls by this class and its descendants.
+
+ @param statusCodes The status codes to be added to the set of acceptable HTTP status codes
+ */
++ (void)addAcceptableStatusCodes:(NSIndexSet *)statusCodes;
+
+/**
+ Returns an `NSSet` object containing the acceptable MIME types. When non-`nil`, the operation will set the `error` property to an error in `AFErrorDomain`. See http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17
+
+ By default, this is `nil`.
+ */
++ (NSSet *)acceptableContentTypes;
+
+/**
+ Adds content types to the set of acceptable MIME types returned by `+acceptableContentTypes` in subsequent calls by this class and its descendants.
+
+ @param contentTypes The content types to be added to the set of acceptable MIME types
+ */
++ (void)addAcceptableContentTypes:(NSSet *)contentTypes;
+
+
+///-----------------------------------------------------
+/// @name Determining Whether A Request Can Be Processed
+///-----------------------------------------------------
+
+/**
+ A Boolean value determining whether or not the class can process the specified request. For example, `AFJSONRequestOperation` may check to make sure the content type was `application/json` or the URL path extension was `.json`.
+
+ @param urlRequest The request that is determined to be supported or not supported for this class.
+ */
++ (BOOL)canProcessRequest:(NSURLRequest *)urlRequest;
+
+///-----------------------------------------------------------
+/// @name Setting Completion Block Success / Failure Callbacks
+///-----------------------------------------------------------
+
+/**
+ Sets the `completionBlock` property with a block that executes either the specified success or failure block, depending on the state of the request on completion. If `error` returns a value, which can be caused by an unacceptable status code or content type, then `failure` is executed. Otherwise, `success` is executed.
+
+ This method should be overridden in subclasses in order to specify the response object passed into the success block.
+ 
+ @param success The block to be executed on the completion of a successful request. This block has no return value and takes two arguments: the receiver operation and the object constructed from the response data of the request.
+ @param failure The block to be executed on the completion of an unsuccessful request. This block has no return value and takes two arguments: the receiver operation and the error that occurred during the request.
+ */
+- (void)setCompletionBlockWithSuccess:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+
+@end
+
+///----------------
+/// @name Functions
+///----------------
+
+/**
+ Returns a set of MIME types detected in an HTTP `Accept` or `Content-Type` header.
+ */
+extern NSSet * AFContentTypesFromHTTPHeader(NSString *string);
+
+
+
+
+
+AFNetworkActivityIndicatorManager.h
+============================================================
+Language: Objective-C
+Licence: Other
+
+// AFNetworkActivityIndicatorManager.h
+//
+// Copyright (c) 2011 Gowalla (http://gowalla.com/)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#import <Foundation/Foundation.h>
+
+#import <Availability.h>
+
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
+#import <UIKit/UIKit.h>
+
+/**
+ `AFNetworkActivityIndicatorManager` manages the state of the network activity indicator in the status bar. When enabled, it will listen for notifications indicating that a network request operation has started or finished, and start or stop animating the indicator accordingly. The number of active requests is incremented and decremented much like a stack or a semaphore, and the activity indicator will animate so long as that number is greater than zero.
+
+ You should enable the shared instance of `AFNetworkActivityIndicatorManager` when your application finishes launching. In `AppDelegate application:didFinishLaunchingWithOptions:` you can do so with the following code:
+
+    [[AFNetworkActivityIndicatorManager sharedManager] setEnabled:YES];
+
+ By setting `isNetworkActivityIndicatorVisible` to `YES` for `sharedManager`, the network activity indicator will show and hide automatically as requests start and finish. You should not ever need to call `incrementActivityCount` or `decrementActivityCount` yourself.
+
+ See the Apple Human Interface Guidelines section about the Network Activity Indicator for more information:
+ http://developer.apple.com/library/iOS/#documentation/UserExperience/Conceptual/MobileHIG/UIElementGuidelines/UIElementGuidelines.html#//apple_ref/doc/uid/TP40006556-CH13-SW44
+ */
+@interface AFNetworkActivityIndicatorManager : NSObject
+
+/**
+ A Boolean value indicating whether the manager is enabled.
+
+ If YES, the manager will change status bar network activity indicator according to network operation notifications it receives. The default value is NO.
+ */
+@property (nonatomic, assign, getter = isEnabled) BOOL enabled;
+
+/**
+ A Boolean value indicating whether the network activity indicator is currently displayed in the status bar.
+ */
+@property (readonly, nonatomic, assign) BOOL isNetworkActivityIndicatorVisible;
+
+/**
+ Returns the shared network activity indicator manager object for the system.
+
+ @return The systemwide network activity indicator manager.
+ */
++ (instancetype)sharedManager;
+
+/**
+ Increments the number of active network requests. If this number was zero before incrementing, this will start animating the status bar network activity indicator.
+ */
+- (void)incrementActivityCount;
+
+/**
+ Decrements the number of active network requests. If this number becomes zero before decrementing, this will stop animating the status bar network activity indicator.
+ */
+- (void)decrementActivityCount;
+
+@end
+
+#endif
+
+
+
+
+AFHTTPClient.h
+============================================================
+Language: Objective-C
+Licence: Other
+
+// AFHTTPClient.h
+//
+// Copyright (c) 2011 Gowalla (http://gowalla.com/)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#import <Foundation/Foundation.h>
+#import "AFURLConnectionOperation.h"
+
+#import <Availability.h>
+
+/**
+ `AFHTTPClient` captura los patrones comunes de la comunicación con una aplicación web a través de HTTP. Encapsula información como URL base, las credenciales de autorización, y las cabeceras HTTP, y los utiliza para construir y gestionar la ejecución de las operaciones de solicitud HTTP.
+
+ ## Automatic Content
+
+ Instances of `AFHTTPClient` may specify which types of requests it expects and should handle by registering HTTP operation classes for automatic parsing. Registered classes will determine whether they can handle a particular request, and then construct a request operation accordingly in `enqueueHTTPRequestOperationWithRequest:success:failure`.
+
+ ## Subclassing Notes
+
+ In most cases, one should create an `AFHTTPClient` subclass for each website or web application that your application communicates with. It is often useful, also, to define a class method that returns a singleton shared HTTP client in each subclass, that persists authentication credentials and other configuration across the entire application.
+
+ ## Methods to Override
+
+ To change the behavior of all url request construction for an `AFHTTPClient` subclass, override `requestWithMethod:path:parameters`.
+
+ To change the behavior of all request operation construction for an `AFHTTPClient` subclass, override `HTTPRequestOperationWithRequest:success:failure`.
+
+ ## Default Headers
+
+ By default, `AFHTTPClient` sets the following HTTP headers:
+
+ - `Accept-Language: (comma-delimited preferred languages), en-us;q=0.8`
+ - `User-Agent: (generated user agent)`
+
+ You can override these HTTP headers or define new ones using `setDefaultHeader:value:`.
+
+ ## URL Construction Using Relative Paths
+
+ Both `-requestWithMethod:path:parameters:` and `-multipartFormRequestWithMethod:path:parameters:constructingBodyWithBlock:` construct URLs from the path relative to the `-baseURL`, using `NSURL +URLWithString:relativeToURL:`. Below are a few examples of how `baseURL` and relative paths interact:
+
+    NSURL *baseURL = [NSURL URLWithString:@"http://example.com/v1/"];
+    [NSURL URLWithString:@"foo" relativeToURL:baseURL];                  // http://example.com/v1/foo
+    [NSURL URLWithString:@"foo?bar=baz" relativeToURL:baseURL];          // http://example.com/v1/foo?bar=baz
+    [NSURL URLWithString:@"/foo" relativeToURL:baseURL];                 // http://example.com/foo
+    [NSURL URLWithString:@"foo/" relativeToURL:baseURL];                 // http://example.com/v1/foo
+    [NSURL URLWithString:@"/foo/" relativeToURL:baseURL];                // http://example.com/foo/
+    [NSURL URLWithString:@"http://example2.com/" relativeToURL:baseURL]; // http://example2.com/
+
+ Also important to note is that a trailing slash will be added to any `baseURL` without one, which would otherwise cause unexpected behavior when constructing URLs using paths without a leading slash.
+
+ ## NSCoding / NSCopying Conformance
+
+ `AFHTTPClient`  conforms to the `NSCoding` and `NSCopying` protocols, allowing operations to be archived to disk, and copied in memory, respectively. There are a few minor caveats to keep in mind, however:
+
+ - Archives and copies of HTTP clients will be initialized with an empty operation queue.
+ - NSCoding cannot serialize / deserialize block properties, so an archive of an HTTP client will not include any reachability callback block that may be set.
+ */
+
+#ifdef _SYSTEMCONFIGURATION_H
+typedef enum {
+    AFNetworkReachabilityStatusUnknown          = -1,
+    AFNetworkReachabilityStatusNotReachable     = 0,
+    AFNetworkReachabilityStatusReachableViaWWAN = 1,
+    AFNetworkReachabilityStatusReachableViaWiFi = 2,
+} AFNetworkReachabilityStatus;
+#else
+#warning SystemConfiguration framework not found in project, or not included in precompiled header. Network reachability functionality will not be available.
+#endif
+
+#ifndef __UTTYPE__
+#if __IPHONE_OS_VERSION_MIN_REQUIRED
+#warning MobileCoreServices framework not found in project, or not included in precompiled header. Automatic MIME type detection when uploading files in multipart requests will not be available.
+#else
+#warning CoreServices framework not found in project, or not included in precompiled header. Automatic MIME type detection when uploading files in multipart requests will not be available.
+#endif
+#endif
+
+typedef enum {
+    AFFormURLParameterEncoding,
+    AFJSONParameterEncoding,
+    AFPropertyListParameterEncoding,
+} AFHTTPClientParameterEncoding;
+
+@class AFHTTPRequestOperation;
+@protocol AFMultipartFormData;
+
+@interface AFHTTPClient : NSObject <NSCoding, NSCopying>
+
+///---------------------------------------
+/// @name Accessing HTTP Client Properties
+///---------------------------------------
+
+/**
+ The url used as the base for paths specified in methods such as `getPath:parameters:success:failure`
+ */
+@property (readonly, nonatomic, strong) NSURL *baseURL;
+
+/**
+ The string encoding used in constructing url requests. This is `NSUTF8StringEncoding` by default.
+ */
+@property (nonatomic, assign) NSStringEncoding stringEncoding;
+
+/**
+ The `AFHTTPClientParameterEncoding` value corresponding to how parameters are encoded into a request body. This is `AFFormURLParameterEncoding` by default.
+
+ @warning Some nested parameter structures, such as a keyed array of hashes containing inconsistent keys (i.e. `@{@"": @[@{@"a" : @(1)}, @{@"b" : @(2)}]}`), cannot be unambiguously represented in query strings. It is strongly recommended that an unambiguous encoding, such as `AFJSONParameterEncoding`, is used when posting complicated or nondeterministic parameter structures.
+ */
+@property (nonatomic, assign) AFHTTPClientParameterEncoding parameterEncoding;
+
+/**
+ The operation queue which manages operations enqueued by the HTTP client.
+ */
+@property (readonly, nonatomic, strong) NSOperationQueue *operationQueue;
+
+/**
+ The reachability status from the device to the current `baseURL` of the `AFHTTPClient`.
+
+ @warning This property requires the `SystemConfiguration` framework. Add it in the active target's "Link Binary With Library" build phase, and add `#import <SystemConfiguration/SystemConfiguration.h>` to the header prefix of the project (`Prefix.pch`).
+ */
+#ifdef _SYSTEMCONFIGURATION_H
+@property (readonly, nonatomic, assign) AFNetworkReachabilityStatus networkReachabilityStatus;
+#endif
+
+/**
+ Default SSL pinning mode for each `AFHTTPRequestOperation` created by `HTTPRequestOperationWithRequest:success:failure:`.
+ */
+#ifdef _AFNETWORKING_PIN_SSL_CERTIFICATES_
+@property (nonatomic, assign) AFURLConnectionOperationSSLPinningMode defaultSSLPinningMode;
+#endif
+
+/**
+ Whether each `AFHTTPRequestOperation` created by `HTTPRequestOperationWithRequest:success:failure:` should accept an invalid SSL certificate. 
+ 
+ If `_AFNETWORKING_ALLOW_INVALID_SSL_CERTIFICATES_` is set, this property defaults to `YES` for backwards compatibility. Otherwise, this property defaults to `NO`.
+ */
+@property (nonatomic, assign) BOOL allowsInvalidSSLCertificate;
+
+///---------------------------------------------
+/// @name Creating and Initializing HTTP Clients
+///---------------------------------------------
+
+/**
+ Creates and initializes an `AFHTTPClient` object with the specified base URL.
+
+ @param url The base URL for the HTTP client. This argument must not be `nil`.
+
+ @return The newly-initialized HTTP client
+ */
++ (instancetype)clientWithBaseURL:(NSURL *)url;
+
+/**
+ Initializes an `AFHTTPClient` object with the specified base URL.
+ 
+ This is the designated initializer.
+
+ @param url The base URL for the HTTP client. This argument must not be `nil`.
+
+ @return The newly-initialized HTTP client
+ */
+- (id)initWithBaseURL:(NSURL *)url;
+
+///-----------------------------------
+/// @name Managing Reachability Status
+///-----------------------------------
+
+/**
+ Sets a callback to be executed when the network availability of the `baseURL` host changes.
+
+ @param block A block object to be executed when the network availability of the `baseURL` host changes.. This block has no return value and takes a single argument which represents the various reachability states from the device to the `baseURL`.
+
+ @warning This method requires the `SystemConfiguration` framework. Add it in the active target's "Link Binary With Library" build phase, and add `#import <SystemConfiguration/SystemConfiguration.h>` to the header prefix of the project (`Prefix.pch`).
+ */
+#ifdef _SYSTEMCONFIGURATION_H
+- (void)setReachabilityStatusChangeBlock:(void (^)(AFNetworkReachabilityStatus status))block;
+#endif
+
+///-------------------------------
+/// @name Managing HTTP Operations
+///-------------------------------
+
+/**
+ Attempts to register a subclass of `AFHTTPRequestOperation`, adding it to a chain to automatically generate request operations from a URL request.
+
+ When `enqueueHTTPRequestOperationWithRequest:success:failure` is invoked, each registered class is consulted in turn to see if it can handle the specific request. The first class to return `YES` when sent a `canProcessRequest:` message is used to create an operation using `initWithURLRequest:` and do `setCompletionBlockWithSuccess:failure:`. There is no guarantee that all registered classes will be consulted. Classes are consulted in the reverse order of their registration. Attempting to register an already-registered class will move it to the top of the list.
+;;;;;;;;;;;; 
+ @param operationClass The subclass of `AFHTTPRequestOperation` to register
+
+ @return `YES` if the registration is successful, `NO` otherwise. The only failure condition is if `operationClass` is not a subclass of `AFHTTPRequestOperation`.
+ */
+- (BOOL)registerHTTPOperationClass:(Class)operationClass;
+
+/**
+ Unregisters the specified subclass of `AFHTTPRequestOperation` from the chain of classes consulted when `-requestWithMethod:path:parameters` is called.
+
+ @param operationClass The subclass of `AFHTTPRequestOperation` to register
+ */
+- (void)unregisterHTTPOperationClass:(Class)operationClass;
+
+///----------------------------------
+/// @name Managing HTTP Header Values
+///----------------------------------
+
+/**
+ Returns the value for the HTTP headers set in request objects created by the HTTP client.
+
+ @param header The HTTP header to return the default value for
+
+ @return The default value for the HTTP header, or `nil` if unspecified
+ */
+- (NSString *)defaultValueForHeader:(NSString *)header;
+
+/**
+ Sets the value for the HTTP headers set in request objects made by the HTTP client. If `nil`, removes the existing value for that header.
+
+ @param header The HTTP header to set a default value for
+ @param value The value set as default for the specified header, or `nil
+ */
+- (void)setDefaultHeader:(NSString *)header
+                   value:(NSString *)value;
+
+/**
+ Sets the "Authorization" HTTP header set in request objects made by the HTTP client to a basic authentication value with Base64-encoded username and password. This overwrites any existing value for this header.
+
+ @param username The HTTP basic auth username
+ @param password The HTTP basic auth password
+ */
+- (void)setAuthorizationHeaderWithUsername:(NSString *)username
+                                  password:(NSString *)password;
+
+/**
+ Sets the "Authorization" HTTP header set in request objects made by the HTTP client to a token-based authentication value, such as an OAuth access token. This overwrites any existing value for this header.
+
+ @param token The authentication token
+ */
+- (void)setAuthorizationHeaderWithToken:(NSString *)token;
+
+
+/**
+ Clears any existing value for the "Authorization" HTTP header.
+ */
+- (void)clearAuthorizationHeader;
+
+///-------------------------------
+/// @name Managing URL Credentials
+///-------------------------------
+
+/**
+ Set the default URL credential to be set for request operations.
+
+ @param credential The URL credential
+ */
+- (void)setDefaultCredential:(NSURLCredential *)credential;
+
+///-------------------------------
+/// @name Creating Request Objects
+///-------------------------------
+
+/**
+ Creates an `NSMutableURLRequest` object with the specified HTTP method and path.
+
+ If the HTTP method is `GET`, `HEAD`, or `DELETE`, the parameters will be used to construct a url-encoded query string that is appended to the request's URL. Otherwise, the parameters will be encoded according to the value of the `parameterEncoding` property, and set as the request body.
+
+ @param method The HTTP method for the request, such as `GET`, `POST`, `PUT`, or `DELETE`. This parameter must not be `nil`.
+ @param path The path to be appended to the HTTP client's base URL and used as the request URL. If `nil`, no path will be appended to the base URL.
+ @param parameters The parameters to be either set as a query string for `GET` requests, or the request HTTP body.
+
+ @return An `NSMutableURLRequest` object
+ */
+- (NSMutableURLRequest *)requestWithMethod:(NSString *)method
+                                      path:(NSString *)path
+                                parameters:(NSDictionary *)parameters;
+
+/**
+ Creates an `NSMutableURLRequest` object with the specified HTTP method and path, and constructs a `multipart/form-data` HTTP body, using the specified parameters and multipart form data block. See http://www.w3.org/TR/html4/interact/forms.html#h-17.13.4.2
+
+ Multipart form requests are automatically streamed, reading files directly from disk along with in-memory data in a single HTTP body. The resulting `NSMutableURLRequest` object has an `HTTPBodyStream` property, so refrain from setting `HTTPBodyStream` or `HTTPBody` on this request object, as it will clear out the multipart form body stream.
+ 
+ @param method The HTTP method for the request. This parameter must not be `GET` or `HEAD`, or `nil`.
+ @param path The path to be appended to the HTTP client's base URL and used as the request URL.
+ @param parameters The parameters to be encoded and set in the request HTTP body.
+ @param block A block that takes a single argument and appends data to the HTTP body. The block argument is an object adopting the `AFMultipartFormData` protocol. This can be used to upload files, encode HTTP body as JSON or XML, or specify multiple values for the same parameter, as one might for array values.
+
+ @return An `NSMutableURLRequest` object
+ */
+- (NSMutableURLRequest *)multipartFormRequestWithMethod:(NSString *)method
+                                                   path:(NSString *)path
+                                             parameters:(NSDictionary *)parameters
+                              constructingBodyWithBlock:(void (^)(id <AFMultipartFormData> formData))block;
+
+///-------------------------------
+/// @name Creating HTTP Operations
+///-------------------------------
+
+/**
+ Creates an `AFHTTPRequestOperation`.
+
+ In order to determine what kind of operation is created, each registered subclass conforming to the `AFHTTPClient` protocol is consulted (in reverse order of when they were specified) to see if it can handle the specific request. The first class to return `YES` when sent a `canProcessRequest:` message is used to generate an operation using `HTTPRequestOperationWithRequest:success:failure:`.
+
+ @param urlRequest The request object to be loaded asynchronously during execution of the operation.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the created request operation and the object created from the response data of request.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes two arguments:, the created request operation and the `NSError` object describing the network or parsing error that occurred.
+ */
+- (AFHTTPRequestOperation *)HTTPRequestOperationWithRequest:(NSURLRequest *)urlRequest
+                                                    success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                                                    failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+
+///----------------------------------------
+/// @name Managing Enqueued HTTP Operations
+///----------------------------------------
+
+/**
+ Enqueues an `AFHTTPRequestOperation` to the HTTP client's operation queue.
+
+ @param operation The HTTP request operation to be enqueued.
+ */
+- (void)enqueueHTTPRequestOperation:(AFHTTPRequestOperation *)operation;
+
+/**
+ Cancels all operations in the HTTP client's operation queue whose URLs match the specified HTTP method and path.
+ 
+ This method only cancels `AFHTTPRequestOperations` whose request URL matches the HTTP client base URL with the path appended. For complete control over the lifecycle of enqueued operations, you can access the `operationQueue` property directly, which allows you to, for instance, cancel operations filtered by a predicate, or simply use `-cancelAllRequests`. Note that the operation queue may include non-HTTP operations, so be sure to check the type before attempting to directly introspect an operation's `request` property.
+;;;;;;;;;;;;
+ @param method The HTTP method to match for the cancelled requests, such as `GET`, `POST`, `PUT`, or `DELETE`. If `nil`, all request operations with URLs matching the path will be cancelled.
+ @param path The path appended to the HTTP client base URL to match against the cancelled requests. If `nil`, no path will be appended to the base URL.
+ */
+- (void)cancelAllHTTPOperationsWithMethod:(NSString *)method path:(NSString *)path;
+
+///---------------------------------------
+/// @name Batching HTTP Request Operations
+///---------------------------------------
+
+/**
+ Creates and enqueues an `AFHTTPRequestOperation` to the HTTP client's operation queue for each specified request object into a batch. When each request operation finishes, the specified progress block is executed, until all of the request operations have finished, at which point the completion block also executes.
+
+ Operations are created by passing the specified `NSURLRequest` objects in `requests`, using `-HTTPRequestOperationWithRequest:success:failure:`, with `nil` for both the `success` and `failure` parameters.
+ 
+ @param urlRequests The `NSURLRequest` objects used to create and enqueue operations.
+ @param progressBlock A block object to be executed upon the completion of each request operation in the batch. This block has no return value and takes two arguments: the number of operations that have already finished execution, and the total number of operations.
+ @param completionBlock A block object to be executed upon the completion of all of the request operations in the batch. This block has no return value and takes a single argument: the batched request operations.
+ */
+- (void)enqueueBatchOfHTTPRequestOperationsWithRequests:(NSArray *)urlRequests
+                                          progressBlock:(void (^)(NSUInteger numberOfFinishedOperations, NSUInteger totalNumberOfOperations))progressBlock
+                                        completionBlock:(void (^)(NSArray *operations))completionBlock;
+
+/**
+ Enqueues the specified request operations into a batch. When each request operation finishes, the specified progress block is executed, until all of the request operations have finished, at which point the completion block also executes.
+
+ @param operations The request operations used to be batched and enqueued.
+ @param progressBlock A block object to be executed upon the completion of each request operation in the batch. This block has no return value and takes two arguments: the number of operations that have already finished execution, and the total number of operations.
+ @param completionBlock A block object to be executed upon the completion of all of the request operations in the batch. This block has no return value and takes a single argument: the batched request operations.
+ */
+- (void)enqueueBatchOfHTTPRequestOperations:(NSArray *)operations
+                              progressBlock:(void (^)(NSUInteger numberOfFinishedOperations, NSUInteger totalNumberOfOperations))progressBlock
+                            completionBlock:(void (^)(NSArray *operations))completionBlock;
+
+///---------------------------
+/// @name Making HTTP Requests
+///---------------------------
+
+/**
+ Creates an `AFHTTPRequestOperation` with a `GET` request, and enqueues it to the HTTP client's operation queue.
+
+ @param path The path to be appended to the HTTP client's base URL and used as the request URL.
+ @param parameters The parameters to be encoded and appended as the query string for the request URL.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the created request operation and the object created from the response data of request.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes two arguments:, the created request operation and the `NSError` object describing the network or parsing error that occurred.
+
+ @see -HTTPRequestOperationWithRequest:success:failure:
+ */
+- (void)getPath:(NSString *)path
+     parameters:(NSDictionary *)parameters
+        success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+        failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+
+/**
+ Creates an `AFHTTPRequestOperation` with a `POST` request, and enqueues it to the HTTP client's operation queue.
+
+ @param path The path to be appended to the HTTP client's base URL and used as the request URL.
+ @param parameters The parameters to be encoded and set in the request HTTP body.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the created request operation and the object created from the response data of request.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes two arguments:, the created request operation and the `NSError` object describing the network or parsing error that occurred.
+
+ @see -HTTPRequestOperationWithRequest:success:failure:
+ */
+- (void)postPath:(NSString *)path
+      parameters:(NSDictionary *)parameters
+         success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+         failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+
+/**
+ Creates an `AFHTTPRequestOperation` with a `PUT` request, and enqueues it to the HTTP client's operation queue.
+
+ @param path The path to be appended to the HTTP client's base URL and used as the request URL.
+ @param parameters The parameters to be encoded and set in the request HTTP body.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the created request operation and the object created from the response data of request.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes two arguments:, the created request operation and the `NSError` object describing the network or parsing error that occurred.
+
+ @see -HTTPRequestOperationWithRequest:success:failure:
+ */
+- (void)putPath:(NSString *)path
+     parameters:(NSDictionary *)parameters
+        success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+        failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+
+/**
+ Creates an `AFHTTPRequestOperation` with a `DELETE` request, and enqueues it to the HTTP client's operation queue.
+
+ @param path The path to be appended to the HTTP client's base URL and used as the request URL.
+ @param parameters The parameters to be encoded and appended as the query string for the request URL.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the created request operation and the object created from the response data of request.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes two arguments:, the created request operation and the `NSError` object describing the network or parsing error that occurred.
+
+ @see -HTTPRequestOperationWithRequest:success:failure:
+ */
+- (void)deletePath:(NSString *)path
+        parameters:(NSDictionary *)parameters
+           success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+           failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+
+/**
+ Creates an `AFHTTPRequestOperation` with a `PATCH` request, and enqueues it to the HTTP client's operation queue.
+
+ @param path The path to be appended to the HTTP client's base URL and used as the request URL.
+ @param parameters The parameters to be encoded and set in the request HTTP body.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the created request operation and the object created from the response data of request.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes two arguments:, the created request operation and the `NSError` object describing the network or parsing error that occurred.
+
+ @see -HTTPRequestOperationWithRequest:success:failure:
+ */
+- (void)patchPath:(NSString *)path
+       parameters:(NSDictionary *)parameters
+          success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+          failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+@end
+
+///----------------
+/// @name Constants
+///----------------
+
+/**
+ ## Network Reachability
+
+ The following constants are provided by `AFHTTPClient` as possible network reachability statuses.
+
+ enum {
+ AFNetworkReachabilityStatusUnknown,
+ AFNetworkReachabilityStatusNotReachable,
+ AFNetworkReachabilityStatusReachableViaWWAN,
+ AFNetworkReachabilityStatusReachableViaWiFi,
+ }
+
+ `AFNetworkReachabilityStatusUnknown`
+ The `baseURL` host reachability is not known.
+
+ `AFNetworkReachabilityStatusNotReachable`
+ The `baseURL` host cannot be reached.
+
+ `AFNetworkReachabilityStatusReachableViaWWAN`
+ The `baseURL` host can be reached via a cellular connection, such as EDGE or GPRS.
+
+ `AFNetworkReachabilityStatusReachableViaWiFi`
+ The `baseURL` host can be reached via a Wi-Fi connection.
+
+ ### Keys for Notification UserInfo Dictionary
+
+ Strings that are used as keys in a `userInfo` dictionary in a network reachability status change notification.
+
+ `AFNetworkingReachabilityNotificationStatusItem`
+ A key in the userInfo dictionary in a `AFNetworkingReachabilityDidChangeNotification` notification.
+ The corresponding value is an `NSNumber` object representing the `AFNetworkReachabilityStatus` value for the current reachability status.
+
+ ## Parameter Encoding
+
+ The following constants are provided by `AFHTTPClient` as possible methods for serializing parameters into query string or message body values.
+
+ enum {
+ AFFormURLParameterEncoding,
+ AFJSONParameterEncoding,
+ AFPropertyListParameterEncoding,
+ }
+
+ `AFFormURLParameterEncoding`
+ Parameters are encoded into field/key pairs in the URL query string for `GET` `HEAD` and `DELETE` requests, and in the message body otherwise. Dictionary keys are sorted with the `caseInsensitiveCompare:` selector of their description, in order to mitigate the possibility of ambiguous query strings being generated non-deterministically. See the warning for the `parameterEncoding` property for additional information.
+
+ `AFJSONParameterEncoding`
+ Parameters are encoded into JSON in the message body.
+
+ `AFPropertyListParameterEncoding`
+ Parameters are encoded into a property list in the message body.
+ */
+
+///----------------
+/// @name Functions
+///----------------
+
+/**
+ Returns a query string constructed by a set of parameters, using the specified encoding.
+
+ Query strings are constructed by collecting each key-value pair, percent escaping a string representation of the key-value pair, and then joining the pairs with "&".
+ 
+ If a query string pair has a an `NSArray` for its value, each member of the array will be represented in the format `field[]=value1&field[]value2`. Otherwise, the pair will be formatted as "field=value". String representations of both keys and values are derived using the `-description` method. The constructed query string does not include the ? character used to delimit the query component.
+ 
+ @param parameters The parameters used to construct the query string
+ @param encoding The encoding to use in constructing the query string. If you are uncertain of the correct encoding, you should use UTF-8 (`NSUTF8StringEncoding`), which is the encoding designated by RFC 3986 as the correct encoding for use in URLs.
+
+ @return A percent-escaped query string
+ */
+extern NSString * AFQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSStringEncoding encoding);
+
+///--------------------
+/// @name Notifications
+///--------------------
+
+/**
+ Posted when network reachability changes.
+ This notification assigns no notification object. The `userInfo` dictionary contains an `NSNumber` object under the `AFNetworkingReachabilityNotificationStatusItem` key, representing the `AFNetworkReachabilityStatus` value for the current network reachability.
+
+ @warning In order for network reachability to be monitored, include the `SystemConfiguration` framework in the active target's "Link Binary With Library" build phase, and add `#import <SystemConfiguration/SystemConfiguration.h>` to the header prefix of the project (`Prefix.pch`).
+ */
+#ifdef _SYSTEMCONFIGURATION_H
+extern NSString * const AFNetworkingReachabilityDidChangeNotification;
+extern NSString * const AFNetworkingReachabilityNotificationStatusItem;
+#endif
+
+#pragma mark -
+
+extern NSUInteger const kAFUploadStream3GSuggestedPacketSize;
+extern NSTimeInterval const kAFUploadStream3GSuggestedDelay;
+
+/**
+ The `AFMultipartFormData` protocol defines the methods supported by the parameter in the block argument of `AFHTTPClient -multipartFormRequestWithMethod:path:parameters:constructingBodyWithBlock:`.
+ */
+@protocol AFMultipartFormData
+
+/**
+ Appends the HTTP header `Content-Disposition: file; filename=#{generated filename}; name=#{name}"` and `Content-Type: #{generated mimeType}`, followed by the encoded file data and the multipart form boundary.
+
+ The filename and MIME type for this data in the form will be automatically generated, using the last path component of the `fileURL` and system associated MIME type for the `fileURL` extension, respectively.
+ 
+ @param fileURL The URL corresponding to the file whose content will be appended to the form. This parameter must not be `nil`.
+ @param name The name to be associated with the specified data. This parameter must not be `nil`.
+ @param error If an error occurs, upon return contains an `NSError` object that describes the problem.
+
+ @return `YES` if the file data was successfully appended, otherwise `NO`.
+ */
+- (BOOL)appendPartWithFileURL:(NSURL *)fileURL
+                         name:(NSString *)name
+                        error:(NSError * __autoreleasing *)error;
+
+/**
+ Appends the HTTP header `Content-Disposition: file; filename=#{filename}; name=#{name}"` and `Content-Type: #{mimeType}`, followed by the encoded file data and the multipart form boundary.
+
+ @param fileURL The URL corresponding to the file whose content will be appended to the form. This parameter must not be `nil`.
+ @param name The name to be associated with the specified data. This parameter must not be `nil`.
+ @param fileName The file name to be used in the `Content-Disposition` header. This parameter must not be `nil`.
+ @param mimeType The declared MIME type of the file data. This parameter must not be `nil`.
+ @param error If an error occurs, upon return contains an `NSError` object that describes the problem.
+
+ @return `YES` if the file data was successfully appended otherwise `NO`.
+ */
+- (BOOL)appendPartWithFileURL:(NSURL *)fileURL
+                         name:(NSString *)name
+                     fileName:(NSString *)fileName
+                     mimeType:(NSString *)mimeType
+                        error:(NSError * __autoreleasing *)error;
+
+/**
+ Appends the HTTP header `Content-Disposition: file; filename=#{filename}; name=#{name}"` and `Content-Type: #{mimeType}`, followed by the data from the input stream and the multipart form boundary.
+
+ @param inputStream The input stream to be appended to the form data
+ @param name The name to be associated with the specified input stream. This parameter must not be `nil`.
+ @param fileName The filename to be associated with the specified input stream. This parameter must not be `nil`.
+ @param length The length of the specified input stream in bytes.
+ @param mimeType The MIME type of the specified data. (For example, the MIME type for a JPEG image is image/jpeg.) For a list of valid MIME types, see http://www.iana.org/assignments/media-types/. This parameter must not be `nil`.
+ */
+- (void)appendPartWithInputStream:(NSInputStream *)inputStream
+                             name:(NSString *)name
+                         fileName:(NSString *)fileName
+                           length:(unsigned long long)length
+                         mimeType:(NSString *)mimeType;
+
+/**
+ Appends the HTTP header `Content-Disposition: file; filename=#{filename}; name=#{name}"` and `Content-Type: #{mimeType}`, followed by the encoded file data and the multipart form boundary.
+
+ @param data The data to be encoded and appended to the form data.
+ @param name The name to be associated with the specified data. This parameter must not be `nil`.
+ @param fileName The filename to be associated with the specified data. This parameter must not be `nil`.
+ @param mimeType The MIME type of the specified data. (For example, the MIME type for a JPEG image is image/jpeg.) For a list of valid MIME types, see http://www.iana.org/assignments/media-types/. This parameter must not be `nil`.
+ */
+- (void)appendPartWithFileData:(NSData *)data
+                          name:(NSString *)name
+                      fileName:(NSString *)fileName
+                      mimeType:(NSString *)mimeType;
+
+/**
+ Appends the HTTP headers `Content-Disposition: form-data; name=#{name}"`, followed by the encoded data and the multipart form boundary.
+
+ @param data The data to be encoded and appended to the form data.
+ @param name The name to be associated with the specified data. This parameter must not be `nil`.
+ */
+
+- (void)appendPartWithFormData:(NSData *)data
+                          name:(NSString *)name;
+
+
+/**
+ Appends HTTP headers, followed by the encoded data and the multipart form boundary.
+
+ @param headers The HTTP headers to be appended to the form data.
+ @param body The data to be encoded and appended to the form data.
+ */
+- (void)appendPartWithHeaders:(NSDictionary *)headers
+                         body:(NSData *)body;
+
+/**
+ Throttles request bandwidth by limiting the packet size and adding a delay for each chunk read from the upload stream.
+
+ When uploading over a 3G or EDGE connection, requests may fail with "request body stream exhausted". Setting a maximum packet size and delay according to the recommended values (`kAFUploadStream3GSuggestedPacketSize` and `kAFUploadStream3GSuggestedDelay`) lowers the risk of the input stream exceeding its allocated bandwidth. Unfortunately, as of iOS 6, there is no definite way to distinguish between a 3G, EDGE, or LTE connection. As such, it is not recommended that you throttle bandwidth based solely on network reachability. Instead, you should consider checking for the "request body stream exhausted" in a failure block, and then retrying the request with throttled bandwidth.
+;;;;;;;;;;;;
+ @param numberOfBytes Maximum packet size, in number of bytes. The default packet size for an input stream is 32kb.
+ @param delay Duration of delay each time a packet is read. By default, no delay is set.
+ */
+- (void)throttleBandwidthWithPacketSize:(NSUInteger)numberOfBytes
+                                  delay:(NSTimeInterval)delay;
+
+@end
+
+
+
+
+
+
+// AFHTTPRequestOperation.h
+//
+// Copyright (c) 2011 Gowalla (http://gowalla.com/)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#import <Foundation/Foundation.h>
+#import "AFURLConnectionOperation.h"
+
+/**
+ `AFHTTPRequestOperation` is a subclass of `AFURLConnectionOperation` for requests using the HTTP or HTTPS protocols. It encapsulates the concept of acceptable status codes and content types, which determine the success or failure of a request.
+ */
+@interface AFHTTPRequestOperation : AFURLConnectionOperation
+
+///----------------------------------------------
+/// @name Getting HTTP URL Connection Information
+///----------------------------------------------
+
+/**
+ The last HTTP response received by the operation's connection.
+ */
+@property (readonly, nonatomic, strong) NSHTTPURLResponse *response;
+
+///----------------------------------------------------------
+/// @name Managing And Checking For Acceptable HTTP Responses
+///----------------------------------------------------------
+
+/**
+ A Boolean value that corresponds to whether the status code of the response is within the specified set of acceptable status codes. Returns `YES` if `acceptableStatusCodes` is `nil`.
+ */
+@property (nonatomic, readonly) BOOL hasAcceptableStatusCode;
+
+/**
+ A Boolean value that corresponds to whether the MIME type of the response is among the specified set of acceptable content types. Returns `YES` if `acceptableContentTypes` is `nil`.
+ */
+@property (nonatomic, readonly) BOOL hasAcceptableContentType;
+
+/**
+ The callback dispatch queue on success. If `NULL` (default), the main queue is used.
+ */
+@property (nonatomic, assign) dispatch_queue_t successCallbackQueue;
+
+/**
+ The callback dispatch queue on failure. If `NULL` (default), the main queue is used.
+ */
+@property (nonatomic, assign) dispatch_queue_t failureCallbackQueue;
+
+///------------------------------------------------------------
+/// @name Managing Acceptable HTTP Status Codes & Content Types
+///------------------------------------------------------------
+
+/**
+ Returns an `NSIndexSet` object containing the ranges of acceptable HTTP status codes. When non-`nil`, the operation will set the `error` property to an error in `AFErrorDomain`. See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+
+ By default, this is the range 200 to 299, inclusive.
+ */
++ (NSIndexSet *)acceptableStatusCodes;
+
+/**
+ Adds status codes to the set of acceptable HTTP status codes returned by `+acceptableStatusCodes` in subsequent calls by this class and its descendants.
+
+ @param statusCodes The status codes to be added to the set of acceptable HTTP status codes
+ */
++ (void)addAcceptableStatusCodes:(NSIndexSet *)statusCodes;
+
+/**
+ Returns an `NSSet` object containing the acceptable MIME types. When non-`nil`, the operation will set the `error` property to an error in `AFErrorDomain`. See http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.17
+
+ By default, this is `nil`.
+ */
++ (NSSet *)acceptableContentTypes;
+
+/**
+ Adds content types to the set of acceptable MIME types returned by `+acceptableContentTypes` in subsequent calls by this class and its descendants.
+
+ @param contentTypes The content types to be added to the set of acceptable MIME types
+ */
++ (void)addAcceptableContentTypes:(NSSet *)contentTypes;
+
+
+///-----------------------------------------------------
+/// @name Determining Whether A Request Can Be Processed
+///-----------------------------------------------------
+
+/**
+ A Boolean value determining whether or not the class can process the specified request. For example, `AFJSONRequestOperation` may check to make sure the content type was `application/json` or the URL path extension was `.json`.
+
+ @param urlRequest The request that is determined to be supported or not supported for this class.
+ */
++ (BOOL)canProcessRequest:(NSURLRequest *)urlRequest;
+
+///-----------------------------------------------------------
+/// @name Setting Completion Block Success / Failure Callbacks
+///-----------------------------------------------------------
+
+/**
+ Sets the `completionBlock` property with a block that executes either the specified success or failure block, depending on the state of the request on completion. If `error` returns a value, which can be caused by an unacceptable status code or content type, then `failure` is executed. Otherwise, `success` is executed.
+
+ This method should be overridden in subclasses in order to specify the response object passed into the success block.
+ 
+ @param success The block to be executed on the completion of a successful request. This block has no return value and takes two arguments: the receiver operation and the object constructed from the response data of the request.
+ @param failure The block to be executed on the completion of an unsuccessful request. This block has no return value and takes two arguments: the receiver operation and the error that occurred during the request.
+ */
+- (void)setCompletionBlockWithSuccess:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                              failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+
+@end
+
+///----------------
+/// @name Functions
+///----------------
+
+/**
+ Returns a set of MIME types detected in an HTTP `Accept` or `Content-Type` header.
+ */
+extern NSSet * AFContentTypesFromHTTPHeader(NSString *string);
+
+
+
+
+
+
+
+
+
+
+
+AFXMLRequestOperation.h
+============================================================
+Language: Objective-C
+Licence: Other
+
+// AFXMLRequestOperation.h
+//
+// Copyright (c) 2011 Gowalla (http://gowalla.com/)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#import <Foundation/Foundation.h>
+#import "AFHTTPRequestOperation.h"
+
+#import <Availability.h>
+
+/**
+ `AFXMLRequestOperation` is a subclass of `AFHTTPRequestOperation` for downloading and working with XML response data.
+
+ ## Acceptable Content Types
+
+ By default, `AFXMLRequestOperation` accepts the following MIME types, which includes the official standard, `application/xml`, as well as other commonly-used types:
+
+ - `application/xml`
+ - `text/xml`
+
+ ## Use With AFHTTPClient
+
+ When `AFXMLRequestOperation` is registered with `AFHTTPClient`, the response object in the success callback of `HTTPRequestOperationWithRequest:success:failure:` will be an instance of `NSXMLParser`. On platforms that support `NSXMLDocument`, you have the option to ignore the response object, and simply use the `responseXMLDocument` property of the operation argument of the callback.
+ */
+@interface AFXMLRequestOperation : AFHTTPRequestOperation
+
+///----------------------------
+/// @name Getting Response Data
+///----------------------------
+
+/**
+ An `NSXMLParser` object constructed from the response data.
+ */
+@property (readonly, nonatomic, strong) NSXMLParser *responseXMLParser;
+
+#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+/**
+ An `NSXMLDocument` object constructed from the response data. If an error occurs while parsing, `nil` will be returned, and the `error` property will be set to the error.
+ */
+@property (readonly, nonatomic, strong) NSXMLDocument *responseXMLDocument;
+#endif
+
+/**
+ Creates and returns an `AFXMLRequestOperation` object and sets the specified success and failure callbacks.
+
+ @param urlRequest The request object to be loaded asynchronously during execution of the operation
+ @param success A block object to be executed when the operation finishes successfully. This block has no return value and takes three arguments: the request sent from the client, the response received from the server, and the XML parser constructed with the response data of request.
+ @param failure A block object to be executed when the operation finishes unsuccessfully. This block has no return value and takes three arguments: the request sent from the client, the response received from the server, and the error describing the network error that occurred.
+
+ @return A new XML request operation
+ */
++ (instancetype)XMLParserRequestOperationWithRequest:(NSURLRequest *)urlRequest
+											 success:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, NSXMLParser *XMLParser))success
+											 failure:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, NSXMLParser *XMLParser))failure;
+
+
+#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+/**
+ Creates and returns an `AFXMLRequestOperation` object and sets the specified success and failure callbacks.
+
+ @param urlRequest The request object to be loaded asynchronously during execution of the operation
+ @param success A block object to be executed when the operation finishes successfully. This block has no return value and takes three arguments: the request sent from the client, the response received from the server, and the XML document created from the response data of request.
+ @param failure A block object to be executed when the operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data as XML. This block has no return value and takes three arguments: the request sent from the client, the response received from the server, and the error describing the network or parsing error that occurred.
+
+ @return A new XML request operation
+ */
++ (instancetype)XMLDocumentRequestOperationWithRequest:(NSURLRequest *)urlRequest
+											   success:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, NSXMLDocument *document))success
+											   failure:(void (^)(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, NSXMLDocument *document))failure;
+#endif
+
+@end
+
+
+
+
+AFNetworking.h
+============================================================
+Language: Objective-C
+Licence: Other
+
+// AFNetworking.h
+//
+// Copyright (c) 2011 Gowalla (http://gowalla.com/)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#import <Foundation/Foundation.h>
+#import <Availability.h>
+
+#ifndef _AFNETWORKING_
+    #define _AFNETWORKING_
+
+    #import "AFURLConnectionOperation.h"
+
+    #import "AFHTTPRequestOperation.h"
+    #import "AFJSONRequestOperation.h"
+    #import "AFXMLRequestOperation.h"
+    #import "AFPropertyListRequestOperation.h"
+    #import "AFHTTPClient.h"
+
+    #import "AFImageRequestOperation.h"
+
+    #if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
+        #import "AFNetworkActivityIndicatorManager.h"
+        #import "UIImageView+AFNetworking.h"
+    #endif
+#endif /* _AFNETWORKING_ */
+
+
+
+
